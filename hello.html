@@ -1,0 +1,22 @@
+<head>
+    <title>hello</title>
+</head>
+
+<body>
+<h1>Welcome to Meteor!</h1>
+
+<div>
+    This is an example of embedding a React component which contains a pixi.js canvas into a containing Blaze template.
+    <br>
+    Simple commands are available to manipulate the 2D view. <br>
+    This is an atypical React component as it does not use VDom for pixi.js rendering <br>
+</div>
+{{> hello}}
+</body>
+
+<template name="hello">
+    <button>Click Me</button>
+    <p>You've pressed the button {{counter}} times.</p>
+
+    <div>{{> React component=PixiJSViewContainer userId=_id}}</div>
+</template>
