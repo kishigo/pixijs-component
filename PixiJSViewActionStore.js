@@ -33,6 +33,12 @@ ActionType = {
 	AddMesh: 8
 };
 
+FitType = {
+	FitTypeXY: 0,
+	FitTypeX: 1,
+	FitTypeY: 2
+};
+
 AbstractAction = class AbstractAction {
 	constructor () {}
 };
@@ -125,7 +131,10 @@ PixiJSViewActionStore = (function () {
 	});
 	
 	var _state = {
-		camera: CameraType.perspective
+	};
+	
+	var _setPluginRenderer = function _setPluginRenderer (renderer) {
+		_state.pluginRenderer = renderer;
 	};
 	
 	var _buildMesh = function _buildMesh (url, width, height, depth, shape) {
@@ -166,6 +175,7 @@ PixiJSViewActionStore = (function () {
 	};
 	
 	return {
+		setPluginRenderer: _setPluginRenderer,
 		getAll: _getAll,
 		getState: _getState
 	}

@@ -25,7 +25,7 @@
  * Act as a parent to the PixiJSView component to allow that component to be reusable
  */
 PixiJSViewContainer = React.createClass({
-	pixiJSViewData: {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300, VIEW_ANGLE: 75, NEAR: 0.1, FAR: 1000},
+	pixiJSViewData: {canvasWidth: 900, canvasHeight: 700, testMode: true, defaultFitMode: FitType.FitTypeXY, WIDTH: 400, HEIGHT: 300, VIEW_ANGLE: 75, NEAR: 0.1, FAR: 1000},
 	getInitialState: function () {
 		console.log('getInitialState');
 		let state = PixiJSViewActionStore.getAll();

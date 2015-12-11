@@ -42,67 +42,32 @@ PixiJSView = React.createClass({
 	},
 	render: function () {
 		console.log('PixiJSView:render');
-		return (<div className="ThreeJSView" ref='threeJSView' align="center"
+		return (<div className="PixiJSView" ref='threeJSView' align="center"
 					 style={{position: 'absolute', left: 0, width: 100 + '%', height: 100 + '%'}}>
-			<canvas className='ThreeJSCanvas' ref='threeJSCanvas'
+			<canvas className='PixiJSCanvas' ref='pixiJSCanvas'
 					style={{display: 'table-row', backgroundColor: '#222222'}}></canvas>
 		</div>);
 	},
 	componentDidMount: function () {
 		// Use a ref to get the underlying DOM element once we are mounted
-		let renderCanvas = this.refs.threeJSCanvas;
+		let renderCanvas = this.refs.pixiJSCanvas;
 		console.log('componentDidMount, canvas: ' + renderCanvas);
         this.configureCanvas(renderCanvas);
-		if (!this.threeScene) {
-			this.threeScene = new THREE.Scene();
-		}
-		if (!this.threeCamera) {
-			if (this.props.state.camera === CameraType.perspective) {
-				this.threeCamera = new THREE.PerspectiveCamera(this.props.VIEW_ANGLE, this.props.ASPECT, this.props.NEAR, this.props.FAR);
-			}
-			else {
-				let width = this.props.canvasWidth, height = this.props.canvasHeight;
-				this.threeCamera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, this.props.NEAR, this.props.FAR );
-
-			}
-		}
-		if (!this.threeRenderer) {
-			this.threeRenderer = this.getRenderer(renderCanvas);
-		}
-		if (!this.threeControls) {
-			this.threeControls = new THREE.TrackballControls(this.threeCamera);
-			this.threeControls.rotateSpeed = 1.0;
-			this.threeControls.zoomSpeed = 1.2;
-			this.threeControls.panSpeed = 0.8;
-
-			this.threeControls.noZoom = false;
-			this.threeControls.noPan = false;
-
-			this.threeControls.staticMoving = true;
-			this.threeControls.dynamicDampingFactor = 0.3;
-
-			this.threeControls.keys = [ 65, 83, 68 ];
-
-			this.threeControls.addEventListener( 'change', this.render );
-		}
-		stupidFunction(renderCanvas);
-		this.configureThreeJSView(renderCanvas);
-		this.customTest('hello internal');
-		let dims = {width: 10, height: 4};
-		var ground = this.buildGround(dims);
-		this.threeScene.add(ground);
 		
-		var light = new THREE.SpotLight(0xFFFFFF);
-		light.position.set(100,100,2500);
-		this.threeScene.add(light);
-
-		this.threeCamera.position.z = 100;
-		this.runAnimation = true;
-		this.threeAnimate();
-		this.threeRender();
+		if (!this.pixiRenderer) {
+			this.pixiRenderer = PIXI.autoDetectRenderer(renderCanvas.width, renderCanvas.height, {view: renderCanvas});
+		}
+		if (!this.pixiRootContainer) {
+			this.pixiRootContainer = new PIXI.Container();
+		}
+		if (this.props.state.pluginRenderer) {
+			this.props.state.pluginRenderer.setPixiContext(this.pixiRenderer, this.pixiRootContainer);
+		}
+		
+		this.resizeLayout(renderCanvas.width, renderCanvas.height, this.props.defaultFitMode);
+		
 	},
 	componentWillUnmount: function componentWillUnmount () {
-		this.threeControls = this.threeScene = this.threeCamera = this.threeRenderer = null;
 	},
 	shouldComponentUpdate: function shouldComponentUpdate (nextProps, nextState) {
 		console.log('PixiJSView: shouldComponentUpdate: ENTRY');
@@ -143,7 +108,7 @@ PixiJSView = React.createClass({
 		}
 	},
     configureCanvas: function configureCanvas (canvas) {
-        var renderContainer = this.refs.threeJSView;
+        var renderContainer = this.refs.pixiJSView;
         var width;
         var height;
         // set area either from container or props if no container
@@ -158,6 +123,9 @@ PixiJSView = React.createClass({
         canvas.height = height;
         canvas.width = width;
     },
+	resizeLayout: function resizeLayout (width, height, fitMode) {
+		
+	},
 	configureThreeJSView: function configureThreeJSView (canvas) {
 		var renderContainer = this.refs.threeJSView;
 		var width;
