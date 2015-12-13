@@ -133,8 +133,8 @@ PixiJSViewActionStore = (function () {
 	var _state = {
 	};
 	
-	var _setPluginRenderer = function _setPluginRenderer (renderer) {
-		_state.pluginRenderer = renderer;
+	var _setPlugin = function _setPlugin (plugin) {
+		_state.plugin = plugin;
 	};
 	
 	var _buildMesh = function _buildMesh (url, width, height, depth, shape) {
@@ -175,7 +175,7 @@ PixiJSViewActionStore = (function () {
 	};
 	
 	return {
-		setPluginRenderer: _setPluginRenderer,
+		setPlugin: _setPlugin,
 		getAll: _getAll,
 		getState: _getState
 	}

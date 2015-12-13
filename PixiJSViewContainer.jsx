@@ -40,7 +40,7 @@ PixiJSViewContainer = React.createClass({
     },
     componentDidMount: function componentDidMount () {
         console.log('PixiJSViewContainer:componentDidMount');
-		listener = function (bar) {
+		let listener = function (bar) {
 			console.log('Event: PixiJSViewActionStore');
 			let state = PixiJSViewActionStore.getAll();
 			this.setState(state);
@@ -49,5 +49,3 @@ PixiJSViewContainer = React.createClass({
     }
 });
 
-var fakeState = 0;
-var listener;

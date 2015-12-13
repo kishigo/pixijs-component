@@ -60,8 +60,8 @@ PixiJSView = React.createClass({
 		if (!this.pixiRootContainer) {
 			this.pixiRootContainer = new PIXI.Container();
 		}
-		if (this.props.state.pluginRenderer) {
-			this.props.state.pluginRenderer.setPixiContext(this.pixiRenderer, this.pixiRootContainer);
+		if (this.props.state.plugin) {
+			this.props.state.plugin.setContext(this.pixiRenderer, this.pixiRootContainer);
 		}
 		
 		this.resizeLayout(renderCanvas.width, renderCanvas.height, this.props.defaultFitMode);
@@ -94,19 +94,6 @@ PixiJSView = React.createClass({
 		}
 		return !this.isMounted();
 	},
-	customTest: function (xxx) {
-		console.log('customTest, xxx: ' + xxx);
-	},
-	getRenderer: function getRenderer (canvas) {
-		// Detect webgl, fallback to canvas if missing.  Test is from mr.doob sample code to detect webgl
-		try {
-			!!( window.WebGLRenderingContext && ( canvas.getContext('webgl') || canvas.getContext('experimental-webgl') ) );
-			return new THREE.WebGLRenderer({canvas: canvas});
-		}
-		catch (e) {
-			return new THREE.CanvasRenderer({canvas: canvas});
-		}
-	},
     configureCanvas: function configureCanvas (canvas) {
         var renderContainer = this.refs.pixiJSView;
         var width;
@@ -125,38 +112,6 @@ PixiJSView = React.createClass({
     },
 	resizeLayout: function resizeLayout (width, height, fitMode) {
 		
-	},
-	configureThreeJSView: function configureThreeJSView (canvas) {
-		var renderContainer = this.refs.threeJSView;
-		var width;
-		var height;
-		// set area either from container or props if no container
-		if (!this.props.testMode && renderContainer) {
-			width = renderContainer.clientWidth;
-			height = renderContainer.clientHeight;
-		}
-		else {
-			width = this.props.canvasWidth;
-			height = this.props.canvasHeight;
-		}
-		canvas.height = height;
-		canvas.width = width;
-		this.threeControls.handleResize();
-	},
-	buildGround: function buildGround (dims) {
-		var w = dims.width * 10;
-		var h = dims.height * 10;
-		var geometry = new THREE.PlaneGeometry(w, h);
-		//var material = new THREE.MeshPhongMaterial({ ambient: 0x050505, color: 0x0033ff, specular: 0x555555, shininess: 30 });
-		var material = new THREE.MeshBasicMaterial( { color: 0xd2b48c } );
-		var mesh = new THREE.Mesh(geometry, material);
-		mesh.position.y = -20;
-		mesh.rotation.x = -Math.PI/2; //-90 degrees around the xaxis
-		mesh.doubleSided = true;
-		return mesh;
-	},
-	threeRender: function threeRender () {
-		this.threeRenderer.render(this.threeScene, this.threeCamera);
 	},
 	threeAnimate: function threeAnimate () {
 		if (this.runAnimation) {
