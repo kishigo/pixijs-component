@@ -14,10 +14,12 @@ if (Meteor.isClient) {
 	});
 
 	Template.hello.events({
-		'click button': function () {
+		'click #addBackground': function () {
 			// increment the counter when button is clicked
-			Session.set('counter', Session.get('counter') + 1);
-			Dispatcher.dispatch('TEST_TRIGGER');
+			Dispatcher.dispatch('ADD_BACKGROUND');
+		},
+		'click #blinkBackground': function () {
+			Dispatcher.dispatch('BLINK_BACKGROUND');
 		}
 	});
 }

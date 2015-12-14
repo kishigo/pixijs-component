@@ -28,6 +28,7 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 
 	/**
 	 * Store pixi context into plugin
+	 * This should be called once the pixijs engine is initialized
 	 * @param {object} pixiRenderer
 	 * @param {object} pixiRootContainer
 	 */
@@ -35,7 +36,78 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 		this.pixiRenderer = pixiRenderer;
 		this.pixiRootContainer = pixiRootContainer;
 	}
+	/**
+	 * Called from shouldComponentUpdate when it proxies action to here
+	 * @param {object} action - See ActionClass and extensions in the store
+	 */
+	handleAction (action) {
+		switch (action.constructor.name) {
+		case 'ActionAddBackground':
+			this.addBackground(action.color);
+			break;
+		case 'ActionBlink':
+			this.blink(action.color, action.msg);
+			break;
+		}
+	}
+
+	/**
+	 * Example of adding either text or rectangle background as graphics
+	 * @param color
+	 */
+	addBackground (color) {
+		let test = false;
+		if (test) {
+			let style = {
+				fill: '#00FF00'
+			};
+			let testItem = new PIXI.Text('Background', style);
+			testItem.x = 0;
+			testItem.y = 50;
+			this.pixiRootContainer.addChild(testItem);
+		}
+		else {
+			let background = new PIXI.Graphics();
+			background.beginFill(color);
+			background.lineStyle(5, 0xFF0000);
+			background.drawRect(100, 100, 200, 300);
+			background.endFill();
+			this.pixiRootContainer.addChild(background);
+			this.background = background;
+		}
+	}
+
+	/**
+	 * Blink "background"
+	 * @param color
+	 * @param msg
+	 */
+	blink (color, msg) {
+		this.blinkItem(this.background, color);
+	}
+
+	/**
+	 * Blink specific item
+	 * @param item
+	 * @param color
+	 * @param duration
+	 * @param nextFn
+	 */
+	blinkItem (item, color, duration, nextFn) {
+		var blinkColor = color || 0xFF0000;
+		var blinkDuration = duration || 200;
+		var originalTint = item.tint;
+		item.tint = blinkColor;
+		setTimeout(function () {
+			item.tint = originalTint;
+			if (nextFn) {
+				nextFn();
+			}
+		}, blinkDuration);
+	}
 };
+
+// plug us into the store, couple a particular store and associated plugin
 if (Meteor.isClient) {
 	Meteor.startup(function () {
 		console.log('PixiJSViewActionStore.setPlugin');

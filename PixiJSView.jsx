@@ -22,11 +22,6 @@
  * THE SOFTWARE.
  */
 
-CameraType = {
-	perspective: 0,
-	orthographic: 1
-};
-
 PixiJSView = React.createClass({
     proptypes: {
 		// optional
@@ -40,6 +35,10 @@ PixiJSView = React.createClass({
 			canvasHeight: 600
 		};
 	},
+	/**
+	 * For pixijs components which render themselves, this is a one time action
+	 * @returns {XML}
+	 */
 	render: function () {
 		console.log('PixiJSView:render');
 		return (<div className="PixiJSView" ref='threeJSView' align="center"
@@ -48,52 +47,64 @@ PixiJSView = React.createClass({
 					style={{display: 'table-row', backgroundColor: '#222222'}}></canvas>
 		</div>);
 	},
+	/**
+	 * Set up the pixijs basic render context, controls
+	 */
 	componentDidMount: function () {
 		// Use a ref to get the underlying DOM element once we are mounted
 		let renderCanvas = this.refs.pixiJSCanvas;
 		console.log('componentDidMount, canvas: ' + renderCanvas);
         this.configureCanvas(renderCanvas);
+		this.plugin = this.props.state.plugin;
 		
 		if (!this.pixiRenderer) {
 			this.pixiRenderer = PIXI.autoDetectRenderer(renderCanvas.width, renderCanvas.height, {view: renderCanvas});
 		}
 		if (!this.pixiRootContainer) {
 			this.pixiRootContainer = new PIXI.Container();
+			let style = {
+				fill: '#FF0000'
+			};
+			let testItem = new PIXI.Text('Hello', style);
+			testItem.x = 0;
+			testItem.y = 0;
+			this.pixiRootContainer.addChild(testItem);
 		}
-		if (this.props.state.plugin) {
-			this.props.state.plugin.setContext(this.pixiRenderer, this.pixiRootContainer);
+		if (this.plugin) {
+			this.plugin.setContext(this.pixiRenderer, this.pixiRootContainer);
 		}
 		
 		this.resizeLayout(renderCanvas.width, renderCanvas.height, this.props.defaultFitMode);
+		this.runAnimation = true;
+		this.pixiAnimate();
+		this.pixiRender();
 		
 	},
+	/**
+	 * Clear out pixijs context on unmount
+	 */
 	componentWillUnmount: function componentWillUnmount () {
+		this.pixiRootContainer = null;
+		this.pixiRenderer = null;
 	},
+	/**
+	 * This is where we proxy action to plugin and also prevent vdom activity
+	 * @param nextProps
+	 * @param nextState
+	 * @returns {boolean}
+	 */
 	shouldComponentUpdate: function shouldComponentUpdate (nextProps, nextState) {
 		console.log('PixiJSView: shouldComponentUpdate: ENTRY');
 		let action = nextProps.state.action;
-		var delta;
-		switch (action.constructor.name) {
-		case 'ActionZoom':
-			delta = (action.direction === ActionType.ZoomIn) ? -action.zUnits : action.zUnits;
-			this.threeCamera.position.z += delta;
-			break;
-		case 'ActionRotate':
-			this.rotateCameraAroundScene(action.speed, action.direction);
-			break;
-		case 'ActionPan':
-			this.panCameraAcrossScene(action.direction, action.delta);
-			break;
-		case 'ActionCamera':
-			delta = (action.direction === ActionType.CameraUp) ? action.delta : -action.delta;
-			this.threeCamera.position.y += delta;
-			break;
-		case 'ActionAddMesh':
-			this.threeScene.add(action.mesh);
-			break;
+		if (this.plugin) {
+			this.plugin.handleAction(action);
 		}
 		return !this.isMounted();
 	},
+	/**
+	 * Compute canvas height and width
+	 * @param canvas - dom item, mutate height and width on it
+	 */
     configureCanvas: function configureCanvas (canvas) {
         var renderContainer = this.refs.pixiJSView;
         var width;
@@ -111,41 +122,22 @@ PixiJSView = React.createClass({
         canvas.width = width;
     },
 	resizeLayout: function resizeLayout (width, height, fitMode) {
-		
+		// TBD, tied to window size change
 	},
-	threeAnimate: function threeAnimate () {
+	/**
+	 * wrapper around the pixijs render call
+	 */
+	pixiRender: function pixiRender () {
+		this.pixiRenderer.render(this.pixiRootContainer);
+	},
+	/**
+	 * pixijs render with RAF
+	 */
+	pixiAnimate: function pixiAnimate () {
 		if (this.runAnimation) {
-			requestAnimationFrame(this.threeAnimate);
-			this.threeControls.update();
-			this.threeRenderer.render(this.threeScene, this.threeCamera)
+			requestAnimationFrame(this.pixiAnimate);
+			this.pixiRender();
 		}
-	},
-	rotateCameraAroundScene: function rotateCameraAroundScene (rotSpeed, direction) {
-		var x = this.threeCamera.position.x,
-			z = this.threeCamera.position.z;
-	
-		if (direction === ActionType.RotateLt){
-			this.threeCamera.position.x = x * Math.cos(rotSpeed) + z * Math.sin(rotSpeed);
-			this.threeCamera.position.z = z * Math.cos(rotSpeed) - x * Math.sin(rotSpeed);
-		} else if (direction === ActionType.RotateRt){
-			this.threeCamera.position.x = x * Math.cos(rotSpeed) - z * Math.sin(rotSpeed);
-			this.threeCamera.position.z = z * Math.cos(rotSpeed) + x * Math.sin(rotSpeed);
-		}
-	
-		this.threeCamera.lookAt(this.threeScene.position);
-	},
-	panCameraAcrossScene: function panCameraAcrossScene (direction, delta) {
-		if (direction === ActionType.PanLt) {
-			this.threeScene.position.x -= delta;
-		}
-		else if (direction === ActionType.PanRt) {
-			this.threeScene.position.x += delta;
-		}
-		this.threeCamera.lookAt(this.threeScene.position);
 	}
 });
-
-var stupidFunction = function stupidFunction(canvas) {
-	console.log('stupidFunction: ENTRY, canvas: ' + canvas);
-};
 

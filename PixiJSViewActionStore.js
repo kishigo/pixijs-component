@@ -21,26 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-ActionType = {
-	ZoomIn: 0,
-	ZoomOut: 1,
-	RotateRt: 2,
-	RotateLt: 3,
-	PanRt: 4,
-	PanLt: 5,
-	CameraUp: 6,
-	CameraDn: 7,
-	AddMesh: 8
-};
+// Sample store
 
-FitType = {
-	FitTypeXY: 0,
-	FitTypeX: 1,
-	FitTypeY: 2
-};
-
+// Sample actions
 AbstractAction = class AbstractAction {
 	constructor () {}
+};
+
+ActionAddBackground = class ActionAddBackground extends AbstractAction {
+	constructor (color) {
+		super();
+		this.color = color;
+	}
+};
+
+ActionBlink = class ActionBlink extends AbstractAction {
+	constructor (color, msg) {
+		super();
+		this.color = color;
+		this.msg = msg;
+	}
 };
 
 ActionZoom = class ActionZoom extends AbstractAction {
@@ -67,29 +67,22 @@ ActionPan = class ActionPan extends AbstractAction {
 	}
 };
 
-ActionCamera = class ActionCamera extends AbstractAction {
-	constructor (direction, delta) {
-		super();
-		this.direction = direction;
-		this.delta = delta;
-	}
-};
-
-ActionAddMesh = class ActionAddMesh extends AbstractAction {
-	constructor (mesh) {
-		super();
-		this.mesh = mesh;
-	}
-};
-
+/**
+ * Singleton sample store
+ * @type {{setPlugin, getAll, getState}}
+ */
 PixiJSViewActionStore = (function () {
 	const EVENT_TYPE = 'PixiJSViewActionStore';
 	Dispatcher.register(function (action) {
 		switch (action.type) {
-		case 'TEST_TRIGGER':
-			console.log('TEST_TRIGGER');
-			//MBus.publish('_change_', null);
-			EventEx.emit('_change_', {data: null});
+		case 'ADD_BACKGROUND':
+			_state.action = new ActionAddBackground(0xFFFFFF);
+			EventEx.emit(EVENT_TYPE, {data: null});
+			break;
+		case 'BLINK_BACKGROUND':
+			console.log('BLINK_BACKGROUND');
+			_state.action = new ActionBlink(0xFF0000, 'testing blink');
+			EventEx.emit(EVENT_TYPE, {data: null});
 			break;
 		case 'ZOOM_IN':
 			_state.action = new ActionZoom(ActionType.ZoomIn, 10);
@@ -115,68 +108,27 @@ PixiJSViewActionStore = (function () {
 			_state.action = new ActionPan(ActionType.PanLt, 10);
 			EventEx.emit(EVENT_TYPE, {data: null});
 			break;
-		case 'CAMERA_UP':
-			_state.action = new ActionCamera(ActionType.CameraUp, 10);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'CAMERA_DN':
-			_state.action = new ActionCamera(ActionType.CameraDn, 10);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'TEST_MESH':
-			_state.action = new ActionAddMesh(_buildMesh('custom.png', 0.5, 0.5, 0.5, 'sphere'));
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
 		}
 	});
 	
 	var _state = {
 	};
-	
+
+	/**
+	 * callback to get the plugin which supports app specific rendering
+	 * @param {object} plugin - User defined per specific component usage.
+	 * @private
+	 */
 	var _setPlugin = function _setPlugin (plugin) {
 		_state.plugin = plugin;
-	};
-	
-	var _buildMesh = function _buildMesh (url, width, height, depth, shape) {
-		let bitmap = new Image();
-		bitmap.src = url;
-		bitmap.onerror = function () {
-			console.error('Error loading: ' + bitmap.src);
-		};
-		width = width * 10;
-		height = height * 10;
-		depth = depth * 10;
-		let geometry;
-		let texture = THREE.ImageUtils.loadTexture(bitmap.src);
-		let material = new THREE.MeshPhongMaterial({ map: texture });
-		switch (shape) {
-		case 'sphere':
-			geometry = new THREE.SphereGeometry(depth / 2, 64, 64);
-			break;
-		default:
-			geometry = new THREE.BoxGeometry(width, height, depth);
-			break;
-		}
-		let mesh = new THREE.Mesh(geometry, material);
-		mesh.position.y = -20 + (depth / 2);
-		mesh.rotation.y = -Math.PI/2; //-90 degrees around the yaxis
-		// adjust x
-		mesh.position.x = 0;
-		mesh.position.z = 0;
-		return mesh;
 	};
 	
 	var _getAll = function _getAll () {
 		return _state;
 	};
 	
-	var _getState = function _getState () {
-		return _state;
-	};
-	
 	return {
 		setPlugin: _setPlugin,
-		getAll: _getAll,
-		getState: _getState
+		getAll: _getAll
 	}
 })();

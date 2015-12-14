@@ -25,7 +25,7 @@
  * Act as a parent to the PixiJSView component to allow that component to be reusable
  */
 PixiJSViewContainer = React.createClass({
-	pixiJSViewData: {canvasWidth: 900, canvasHeight: 700, testMode: true, defaultFitMode: FitType.FitTypeXY, WIDTH: 400, HEIGHT: 300, VIEW_ANGLE: 75, NEAR: 0.1, FAR: 1000},
+	pixiJSViewData: {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300, VIEW_ANGLE: 75, NEAR: 0.1, FAR: 1000},
 	getInitialState: function () {
 		console.log('getInitialState');
 		let state = PixiJSViewActionStore.getAll();
@@ -35,8 +35,7 @@ PixiJSViewContainer = React.createClass({
 	},
     render: function render () {
         console.log('PixiJSViewContainer:render, pixiJSViewData: ' + this.pixiJSViewData);
-		// Use POJS so we can pass an entire props object instead of specifying individual fields
-		return React.createElement(PixiJSView, this.pixiJSViewData);
+		return <PixiJSView {...this.pixiJSViewData}/>;
     },
     componentDidMount: function componentDidMount () {
         console.log('PixiJSViewContainer:componentDidMount');
