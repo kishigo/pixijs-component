@@ -35,14 +35,14 @@ PixiJSViewContainer = React.createClass({
 	},
     render: function render () {
         console.log('PixiJSViewContainer:render, pixiJSViewData: ' + this.pixiJSViewData);
-		return <PixiJSView {...this.pixiJSViewData}/>;
+		return <PixiJSView {...this.pixiJSViewData} ref={'pixiJSView'} />;
     },
     componentDidMount: function componentDidMount () {
         console.log('PixiJSViewContainer:componentDidMount');
 		let listener = function (bar) {
 			console.log('Event: PixiJSViewActionStore');
-			let state = PixiJSViewActionStore.getAll();
-			this.setState(state);
+			// Pass the state to the real component whenever the store updates the state
+			this.refs.pixiJSView.updateState(PixiJSViewActionStore.getAll());
 		}.bind(this);
 		EventEx.on('PixiJSViewActionStore', listener);
     }

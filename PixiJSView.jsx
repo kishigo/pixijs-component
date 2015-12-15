@@ -138,6 +138,11 @@ PixiJSView = React.createClass({
 			requestAnimationFrame(this.pixiAnimate);
 			this.pixiRender();
 		}
+	},
+	updateState: function updateState (state) {
+		console.log('PixiJSView: updateState: ENTRY,state: ' + state);
+		// Just setState which will cause shouldComponentUpdate to fire
+		this.setState(state);
 	}
 });
 
