@@ -30,10 +30,10 @@ PixiJSView = React.createClass({
         canvasHeight: React.PropTypes.number.isRequired
     },
 	getDefaultProps: function () {
-		return {
-			canvasWidth: 800,
-			canvasHeight: 600
-		};
+		return {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300, VIEW_ANGLE: 75, NEAR: 0.1, FAR: 1000};
+	},
+	getInitialState: function getInitialState () {
+		return this.props.store.getAll();
 	},
 	/**
 	 * For pixijs components which render themselves, this is a one time action
@@ -55,8 +55,15 @@ PixiJSView = React.createClass({
 		let renderCanvas = this.refs.pixiJSCanvas;
 		console.log('componentDidMount, canvas: ' + renderCanvas);
         this.configureCanvas(renderCanvas);
-		this.plugin = this.props.state.plugin;
-		
+		this.plugin = this.state.plugin;
+		let storeName = this.props.store.name;
+		let listener = function (bar) {
+			console.log('Event: ' + storeName);
+			// Pass the state to the real component whenever the store updates the state
+			this.setState(this.props.store.getAll());
+		}.bind(this);
+		EventEx.on(storeName, listener);
+
 		if (!this.pixiRenderer) {
 			this.pixiRenderer = PIXI.autoDetectRenderer(renderCanvas.width, renderCanvas.height, {view: renderCanvas});
 		}
@@ -95,7 +102,7 @@ PixiJSView = React.createClass({
 	 */
 	shouldComponentUpdate: function shouldComponentUpdate (nextProps, nextState) {
 		console.log('PixiJSView: shouldComponentUpdate: ENTRY');
-		let action = nextProps.state.action;
+		let action = nextState.action;
 		if (this.plugin) {
 			this.plugin.handleAction(action);
 		}

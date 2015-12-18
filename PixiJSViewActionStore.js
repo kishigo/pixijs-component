@@ -128,6 +128,7 @@ PixiJSViewActionStore = (function () {
 	};
 	
 	return {
+		name: 'PixiJSViewActionStore',
 		setPlugin: _setPlugin,
 		getAll: _getAll
 	}

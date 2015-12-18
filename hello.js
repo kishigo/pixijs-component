@@ -5,11 +5,14 @@ if (Meteor.isClient) {
 	Session.setDefault('counter', 0);
 
 	Template.hello.helpers({
-		PixiJSViewContainer: function () {
-			return PixiJSViewContainer;
+		PixiJSView: function () {
+			return PixiJSView;
 		},
 		counter: function () {
 			return Session.get('counter');
+		},
+		store: function () {
+			return PixiJSViewActionStore;
 		}
 	});
 
