@@ -30,7 +30,7 @@ PixiJSView = React.createClass({
         canvasHeight: React.PropTypes.number.isRequired
     },
 	getDefaultProps: function () {
-		return {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300, VIEW_ANGLE: 75, NEAR: 0.1, FAR: 1000};
+		return {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300};
 	},
 	getInitialState: function getInitialState () {
 		return this.props.store.getAll();
@@ -55,7 +55,9 @@ PixiJSView = React.createClass({
 		let renderCanvas = this.refs.pixiJSCanvas;
 		console.log('componentDidMount, canvas: ' + renderCanvas);
         this.configureCanvas(renderCanvas);
+		// get the plugin renderer
 		this.plugin = this.state.plugin;
+		// subscribe to the store for flux updates
 		let storeName = this.props.store.name;
 		let listener = function (bar) {
 			console.log('Event: ' + storeName);
@@ -64,24 +66,20 @@ PixiJSView = React.createClass({
 		}.bind(this);
 		EventEx.on(storeName, listener);
 
+		// Do some basic pixijs setup
 		if (!this.pixiRenderer) {
 			this.pixiRenderer = PIXI.autoDetectRenderer(renderCanvas.width, renderCanvas.height, {view: renderCanvas});
 		}
 		if (!this.pixiRootContainer) {
 			this.pixiRootContainer = new PIXI.Container();
-			let style = {
-				fill: '#FF0000'
-			};
-			let testItem = new PIXI.Text('Hello', style);
-			testItem.x = 0;
-			testItem.y = 0;
-			this.pixiRootContainer.addChild(testItem);
 		}
+		// Give the plugin renderer pixi context we setup here
 		if (this.plugin) {
 			this.plugin.setContext(this.pixiRenderer, this.pixiRootContainer);
 		}
 		
 		this.resizeLayout(renderCanvas.width, renderCanvas.height, this.props.defaultFitMode);
+		// Enable animation
 		this.runAnimation = true;
 		this.pixiAnimate();
 		this.pixiRender();
@@ -128,6 +126,12 @@ PixiJSView = React.createClass({
         canvas.height = height;
         canvas.width = width;
     },
+	/**
+	 * TBD
+	 * @param width
+	 * @param height
+	 * @param fitMode
+	 */
 	resizeLayout: function resizeLayout (width, height, fitMode) {
 		// TBD, tied to window size change
 	},

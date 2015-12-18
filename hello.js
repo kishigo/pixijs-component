@@ -23,6 +23,9 @@ if (Meteor.isClient) {
 		},
 		'click #blinkBackground': function () {
 			Dispatcher.dispatch('BLINK_BACKGROUND');
+		},
+		'click #addHello': function () {
+			Dispatcher.dispatch('ADD_HELLO');
 		}
 	});
 }

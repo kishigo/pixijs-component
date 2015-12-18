@@ -48,6 +48,9 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 		case 'ActionBlink':
 			this.blink(action.color, action.msg);
 			break;
+		case 'ActionText':
+			this.addTextToBackground(action.color, action.text);
+			break;
 		}
 	}
 
@@ -70,7 +73,7 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 			let background = new PIXI.Graphics();
 			background.beginFill(color);
 			background.lineStyle(5, 0xFF0000);
-			background.drawRect(100, 100, 200, 300);
+			background.drawRect(0, 0, this.pixiRenderer.width, this.pixiRenderer.height);
 			background.endFill();
 			this.pixiRootContainer.addChild(background);
 			this.background = background;
@@ -88,6 +91,7 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 
 	/**
 	 * Blink specific item
+	 * This is a "tint" operation so color is blended and may not be what you expect, but just a demo.
 	 * @param item
 	 * @param color
 	 * @param duration
@@ -104,6 +108,22 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 				nextFn();
 			}
 		}, blinkDuration);
+	}
+
+	/**
+	 * Add text with color to background
+	 * @param color
+	 * @param text
+	 */
+	addTextToBackground (color, text) {
+		let style = {
+			fill: color
+		};
+		let testItem = new PIXI.Text(text, style);
+		testItem.x = 0;
+		testItem.y = 0;
+		this.background.addChild(testItem);
+
 	}
 };
 

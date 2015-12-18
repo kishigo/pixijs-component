@@ -43,27 +43,11 @@ ActionBlink = class ActionBlink extends AbstractAction {
 	}
 };
 
-ActionZoom = class ActionZoom extends AbstractAction {
-	constructor (direction, zUnits) {
+ActionText = class ActionText extends AbstractAction {
+	constructor (color, text) {
 		super();
-		this.direction = direction;
-		this.zUnits = zUnits;
-	}
-};
-
-ActionRotate = class ActionRotate extends AbstractAction {
-	constructor (direction, speed) {
-		super();
-		this.direction = direction;
-		this.speed = speed;
-	}
-};
-
-ActionPan = class ActionPan extends AbstractAction {
-	constructor (direction, delta) {
-		super();
-		this.direction = direction;
-		this.delta = delta;
+		this.color = color;
+		this.text = text;
 	}
 };
 
@@ -76,7 +60,7 @@ PixiJSViewActionStore = (function () {
 	Dispatcher.register(function (action) {
 		switch (action.type) {
 		case 'ADD_BACKGROUND':
-			_state.action = new ActionAddBackground(0xFFFFFF);
+			_state.action = new ActionAddBackground(0x0000FF);
 			EventEx.emit(EVENT_TYPE, {data: null});
 			break;
 		case 'BLINK_BACKGROUND':
@@ -84,28 +68,9 @@ PixiJSViewActionStore = (function () {
 			_state.action = new ActionBlink(0xFF0000, 'testing blink');
 			EventEx.emit(EVENT_TYPE, {data: null});
 			break;
-		case 'ZOOM_IN':
-			_state.action = new ActionZoom(ActionType.ZoomIn, 10);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'ZOOM_OUT':
-			_state.action = new ActionZoom(ActionType.ZoomOut, 10);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'ROT_RT':
-			_state.action = new ActionRotate(ActionType.RotateRt, 0.2);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'ROT_LT':
-			_state.action = new ActionRotate(ActionType.RotateLt, 0.2);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'PAN_RT':
-			_state.action = new ActionPan(ActionType.PanRt, 10);
-			EventEx.emit(EVENT_TYPE, {data: null});
-			break;
-		case 'PAN_LT':
-			_state.action = new ActionPan(ActionType.PanLt, 10);
+		case 'ADD_HELLO':
+			console.log('ADD_HELLO');
+			_state.action = new ActionText(0x00FF00, 'Hello');
 			EventEx.emit(EVENT_TYPE, {data: null});
 			break;
 		}
