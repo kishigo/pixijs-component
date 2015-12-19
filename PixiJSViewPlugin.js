@@ -43,7 +43,7 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 	handleAction (action) {
 		switch (action.constructor.name) {
 		case 'ActionAddBackground':
-			this.addBackground(action.color);
+			this.addBackground(action.color, action.borderColor);
 			break;
 		case 'ActionBlink':
 			this.blink(action.color, action.msg);
@@ -55,35 +55,24 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 	}
 
 	/**
-	 * Example of adding either text or rectangle background as graphics
-	 * @param color
+	 * Example of adding rectangle background as graphics
+	 * @param {number} color
+	 * @param {number} borderColor
 	 */
-	addBackground (color) {
-		let test = false;
-		if (test) {
-			let style = {
-				fill: '#00FF00'
-			};
-			let testItem = new PIXI.Text('Background', style);
-			testItem.x = 0;
-			testItem.y = 50;
-			this.pixiRootContainer.addChild(testItem);
-		}
-		else {
-			let background = new PIXI.Graphics();
-			background.beginFill(color);
-			background.lineStyle(5, 0xFF0000);
-			background.drawRect(0, 0, this.pixiRenderer.width, this.pixiRenderer.height);
-			background.endFill();
-			this.pixiRootContainer.addChild(background);
-			this.background = background;
-		}
+	addBackground (color, borderColor) {
+		let background = new PIXI.Graphics();
+		background.beginFill(color);
+		background.lineStyle(5, borderColor);
+		background.drawRect(0, 0, this.pixiRenderer.width, this.pixiRenderer.height);
+		background.endFill();
+		this.pixiRootContainer.addChild(background);
+		this.background = background;
 	}
 
 	/**
 	 * Blink "background"
-	 * @param color
-	 * @param msg
+	 * @param {number} color
+	 * @param {string} msg
 	 */
 	blink (color, msg) {
 		this.blinkItem(this.background, color);
@@ -91,11 +80,11 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 
 	/**
 	 * Blink specific item
-	 * This is a "tint" operation so color is blended and may not be what you expect, but just a demo.
-	 * @param item
-	 * @param color
-	 * @param duration
-	 * @param nextFn
+	 * This is a "tint" operation so color is blended and may not be what you expect, to really recolor, we have to redraw.
+	 * @param {object} item
+	 * @param {number} color
+	 * @param {number}duration
+	 * @param {function} nextFn
 	 */
 	blinkItem (item, color, duration, nextFn) {
 		var blinkColor = color || 0xFF0000;
@@ -112,8 +101,8 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 
 	/**
 	 * Add text with color to background
-	 * @param color
-	 * @param text
+	 * @param {number} color
+	 * @param {string} text
 	 */
 	addTextToBackground (color, text) {
 		let style = {

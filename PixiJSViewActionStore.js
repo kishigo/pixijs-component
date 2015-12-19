@@ -29,9 +29,10 @@ AbstractAction = class AbstractAction {
 };
 
 ActionAddBackground = class ActionAddBackground extends AbstractAction {
-	constructor (color) {
+	constructor (color, borderColor) {
 		super();
 		this.color = color;
+		this.borderColor = borderColor;
 	}
 };
 
@@ -60,7 +61,7 @@ PixiJSViewActionStore = (function () {
 	Dispatcher.register(function (action) {
 		switch (action.type) {
 		case 'ADD_BACKGROUND':
-			_state.action = new ActionAddBackground(0x0000FF);
+			_state.action = new ActionAddBackground(0xFFFFFF, 0x0000FF);
 			EventEx.emit(EVENT_TYPE, {data: null});
 			break;
 		case 'BLINK_BACKGROUND':
@@ -87,12 +88,19 @@ PixiJSViewActionStore = (function () {
 	var _setPlugin = function _setPlugin (plugin) {
 		_state.plugin = plugin;
 	};
-	
+	/**
+	 * API to retrieve the state
+	 * @returns {{}}
+	 * @private
+	 */
 	var _getAll = function _getAll () {
 		return _state;
 	};
 	
 	return {
+		/**
+		 * name is a string constant that must match the store variable name
+		 */
 		name: 'PixiJSViewActionStore',
 		setPlugin: _setPlugin,
 		getAll: _getAll
