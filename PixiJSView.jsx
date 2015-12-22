@@ -33,7 +33,59 @@ PixiJSView = React.createClass({
 		return {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300};
 	},
 	getInitialState: function getInitialState () {
-		return this.props.store.getAll();
+		return this.getStateFromStore();
+	},
+	getStateFromStore: function () {
+		return this.getBoundStateFromStore();
+	},
+	getBoundStateFromStore: function () {
+		if (this.boundGetAll) {
+			return this.boundGetAll();
+		}
+		else {
+			if (this.props.store && this.props.store.hasOwnProperty('getAll')) {
+				this.boundGetAll = this.props.store.getAll;
+				return this.boundGetAll();
+			}
+			else {
+				return {};
+			}
+		}
+	},
+	setupStore: function () {
+		if (this.props.store) {
+			if (this.props.store.hasOwnProperty('name')) {
+				let storeName = this.props.store.name;
+				let listener = function () {
+					console.log('Event: ' + storeName);
+					// Guard setState with isMounted()
+					if (this.isMounted()) {
+						console.log('Event: ' + storeName + ', mounted');
+						// Pass the state to the real component whenever the store updates the state
+						this.setState(this.getStateFromStore());
+					}
+					else {
+						console.log('Event: ' + storeName + ', Not mounted');
+					}
+				}.bind(this);
+				EventEx.on(storeName, listener);
+			}
+		}
+	},
+	getPluginFromState: function () {
+		if (this.plugin) {
+			return plugin;
+		}
+		else {
+			if (this.state && this.state.hasOwnProperty('plugin')) {
+				this.plugin = this.state.plugin;
+				return this.plugin;
+
+			}
+			else {
+				return null;
+			}
+		}
 	},
 	/**
 	 * For pixijs components which render themselves, this is a one time action
@@ -56,15 +108,8 @@ PixiJSView = React.createClass({
 		console.log('componentDidMount, canvas: ' + renderCanvas);
         this.configureCanvas(renderCanvas);
 		// get the plugin renderer
-		this.plugin = this.state.plugin;
-		// subscribe to the store for flux updates
-		let storeName = this.props.store.name;
-		let listener = function (bar) {
-			console.log('Event: ' + storeName);
-			// Pass the state to the real component whenever the store updates the state
-			this.setState(this.props.store.getAll());
-		}.bind(this);
-		EventEx.on(storeName, listener);
+		this.plugin = this.getPluginFromState();
+		this.setupStore();
 
 		// Do some basic pixijs setup
 		if (!this.pixiRenderer) {
@@ -149,11 +194,6 @@ PixiJSView = React.createClass({
 			requestAnimationFrame(this.pixiAnimate);
 			this.pixiRender();
 		}
-	},
-	updateState: function updateState (state) {
-		console.log('PixiJSView: updateState: ENTRY,state: ' + state);
-		// Just setState which will cause shouldComponentUpdate to fire
-		this.setState(state);
 	}
 });
 
