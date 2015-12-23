@@ -30,7 +30,7 @@ PixiJSView = React.createClass({
         canvasHeight: React.PropTypes.number.isRequired
     },
 	getDefaultProps: function () {
-		return {canvasWidth: 900, canvasHeight: 700, testMode: true, WIDTH: 400, HEIGHT: 300};
+		return {canvasWidth: 900, canvasHeight: 700, testMode: false, WIDTH: 400, HEIGHT: 300};
 	},
 	getInitialState: function getInitialState () {
 		return this.getStateFromStore();
@@ -93,7 +93,7 @@ PixiJSView = React.createClass({
 	 */
 	render: function () {
 		console.log('PixiJSView:render');
-		return (<div className="PixiJSView" ref='threeJSView' align="center"
+		return (<div className="PixiJSView" ref='pixiJSView' align="center"
 					 style={{position: 'absolute', left: 0, width: 100 + '%', height: 100 + '%'}}>
 			<canvas className='PixiJSCanvas' ref='pixiJSCanvas'
 					style={{display: 'table-row', backgroundColor: '#222222'}}></canvas>
@@ -123,12 +123,11 @@ PixiJSView = React.createClass({
 			this.plugin.setContext(this.pixiRenderer, this.pixiRootContainer);
 		}
 		
-		this.resizeLayout(renderCanvas.width, renderCanvas.height, this.props.defaultFitMode);
 		// Enable animation
 		this.runAnimation = true;
 		this.pixiAnimate();
 		this.pixiRender();
-		
+		window.addEventListener('resize', this.handleResize)
 	},
 	/**
 	 * Clear out pixijs context on unmount
@@ -136,6 +135,7 @@ PixiJSView = React.createClass({
 	componentWillUnmount: function componentWillUnmount () {
 		this.pixiRootContainer = null;
 		this.pixiRenderer = null;
+		window.removeEventListener('resize', this.handleResize)
 	},
 	/**
 	 * This is where we proxy action to plugin and also prevent vdom activity
@@ -171,14 +171,22 @@ PixiJSView = React.createClass({
         canvas.height = height;
         canvas.width = width;
     },
-	/**
-	 * TBD
-	 * @param width
-	 * @param height
-	 * @param fitMode
-	 */
-	resizeLayout: function resizeLayout (width, height, fitMode) {
-		// TBD, tied to window size change
+	handleResize: function handleResize (e) {
+		console.log('handleResize: ' + e);
+		let renderCanvas = this.refs.pixiJSCanvas;
+		this.configureCanvas(renderCanvas);
+		this.pixiRenderer.resize(renderCanvas.width, renderCanvas.height);
+		if (this.resizeLayout) {
+			this.resizeLayout(renderCanvas.width, renderCanvas.height);
+		}
+		if (this.plugin) {
+			if (this.plugin.resizeLayout) {
+				this.resizeLayout = function (w, h) {
+					this.plugin.resizeLayout(w, h);
+				};
+				this.resizeLayout(renderCanvas.width, renderCanvas.height);
+			}
+		}
 	},
 	/**
 	 * wrapper around the pixijs render call

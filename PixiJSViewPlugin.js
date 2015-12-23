@@ -114,6 +114,9 @@ PixiJSViewPlugin = class PixiJSViewPlugin {
 		this.background.addChild(testItem);
 
 	}
+	resizeLayout (width, height) {
+		console.log('resizeLayout: ' + width + ", " + height);
+	}
 };
 
 // plug us into the store, couple a particular store and associated plugin
